@@ -38,6 +38,9 @@ print('#training images = %d' % dataset_size)
 model = create_model(opt)
 visualizer = Visualizer(opt)
 
+total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+print('total # of params = %d' % total_params)
+
 total_steps = (start_epoch-1) * dataset_size + epoch_iter
 
 display_delta = total_steps % opt.display_freq
