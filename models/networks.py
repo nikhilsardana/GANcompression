@@ -204,7 +204,7 @@ class GlobalGenerator(nn.Module):
         if g1_type == "densenet":
             DENSENET_OPTIONS = {
                 "in_planes": ngf * mult,
-                "growth_rate": 0, 
+                "growth_rate": ngf * mult, 
                 "block": BottleneckBlock,
             }
             model += [DenseBlock(n_blocks, **DENSENET_OPTIONS)]
