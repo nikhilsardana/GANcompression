@@ -211,14 +211,23 @@ class GlobalGenerator(nn.Module):
             transition_in_planes = DENSENET_OPTIONS["in_planes"] + n_blocks * DENSENET_OPTIONS["growth_rate"]
             model += [DenseBlock(n_blocks, **DENSENET_OPTIONS), TransitionBlock(transition_in_planes, DENSENET_OPTIONS["in_planes"], dropRate=0.0)]
         
-        #if g1_type == "densenet":
-        #    n_downsampling += 1
+        #one extra upsampling layer for densenet
+        if g1_type == "densenet":
+            n_upsample = n_downsampling +  1
+        else:
+            n_upsample = n_downsampling
         ### upsample
-        for i in range(n_downsampling+1):
+        for i in range(n_upsample):
             mult = 2**(n_downsampling - i)
             model += [nn.ConvTranspose2d(ngf * mult, int(ngf * mult / 2), kernel_size=3, stride=2, padding=1, output_padding=1),
                        norm_layer(int(ngf * mult / 2)), activation]
-        model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf//2, output_nc, kernel_size=7, padding=0), nn.Tanh()]        
+
+        #extra upsampling layer for densenet results in  half the feature maps
+        if g1_type == "densenet":
+            model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf//2, output_nc, kernel_size=7, padding=0), nn.Tanh()]        
+        else:
+            model += [nn.ReflectionPad2d(3), nn.Conv2d(ngf, output_nc, kernel_size=7, padding=0), nn.Tanh()]        
+        
         self.model = nn.Sequential(*model)
             
     def forward(self, input):
