@@ -5,6 +5,7 @@ import torch.nn as nn
 import functools
 from torch.autograd import Variable
 import numpy as np
+import torch.nn.functional as F
 
 ###############################################################################
 # Functions
