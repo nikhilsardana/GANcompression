@@ -6,6 +6,7 @@ import functools
 from torch.autograd import Variable
 import numpy as np
 import torch.nn.functional as F
+import math
 
 ###############################################################################
 # Functions
