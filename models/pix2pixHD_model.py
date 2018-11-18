@@ -144,6 +144,8 @@ class Pix2PixHDModel(BaseModel):
         return input_label, inst_map, real_image, feat_map
 
     def discriminate(self, input_label, test_image, use_pool=False):
+        #print(input_label.shape)
+        #print(test_image.detach().shape)
         input_concat = torch.cat((input_label, test_image.detach()), dim=1)
         if use_pool:            
             fake_query = self.fake_pool.query(input_concat)
