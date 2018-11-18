@@ -209,7 +209,7 @@ class GlobalGenerator(nn.Module):
                 "block": BottleneckBlock,
             }
             transition_in_planes = DENSENET_OPTIONS["in_planes"] + n_blocks * DENSENET_OPTIONS["growth_rate"]
-            model += [DenseBlock(n_blocks, **DENSENET_OPTIONS), TransitionBlock(transition_in_planes, DENSENET_OPTIONS["in_planes"], dropRate=0.0)]
+            model += [DenseBlock(n_blocks, **DENSENET_OPTIONS), TransitionBlock(transition_in_planes, int(math.floor(DENSENET_OPTIONS["in_planes"] * 0.5)), dropRate=0.0)]
         
         ### upsample         
         for i in range(n_downsampling):
