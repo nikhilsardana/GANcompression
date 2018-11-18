@@ -184,7 +184,7 @@ class LocalEnhancer(nn.Module):
 
 class GlobalGenerator(nn.Module):
     def __init__(self, input_nc, output_nc, ngf=64, n_downsampling=3, n_blocks=9, norm_layer=nn.BatchNorm2d, 
-                 padding_type='reflect', g1_type="resnet"):
+                 padding_type='reflect', g1_type="densenet"):
         assert(n_blocks >= 0)
         super(GlobalGenerator, self).__init__()        
         activation = nn.ReLU(True)        
@@ -206,7 +206,6 @@ class GlobalGenerator(nn.Module):
                 "in_planes": ngf * mult,
                 "growth_rate": 0, 
                 "block": BottleneckBlock,
-                "droprate": 0.0,
             }
             model += [DenseBlock(n_blocks, **DENSENET_OPTIONS)]
         
