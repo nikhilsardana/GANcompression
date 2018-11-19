@@ -10,6 +10,7 @@ import util.util as util
 from util.visualizer import Visualizer
 from util import html
 import torch
+import time
 
 opt = TestOptions().parse(save=False)
 opt.nThreads = 1   # test code only supports nThreads = 1
@@ -36,7 +37,8 @@ if not opt.engine and not opt.onnx:
         print(model)
 else:
     from run_engine import run_trt_engine, run_onnx
-    
+
+total_time = 0.0
 for i, data in enumerate(dataset):
     if i >= opt.how_many:
         break
@@ -57,13 +59,23 @@ for i, data in enumerate(dataset):
         generated = run_trt_engine(opt.engine, minibatch, [data['label'], data['inst']])
     elif opt.onnx:
         generated = run_onnx(opt.onnx, opt.data_type, minibatch, [data['label'], data['inst']])
-    else:        
+    else: 
+        start_time = time.time()
         generated = model.inference(data['label'], data['inst'], data['image'])
-        
+        end_time = time.time()
+        print("--- %s seconds ---" % (end_time - start_time))
+        if(i!=0):
+            total_time += end_time - start_time
+        else:
+            print("time not added to total")
+
     visuals = OrderedDict([('input_label', util.tensor2label(data['label'][0], opt.label_nc)),
                            ('synthesized_image', util.tensor2im(generated.data[0]))])
     img_path = data['path']
     print('process image... %s' % img_path)
     visualizer.save_images(webpage, visuals, img_path)
 
+print("images tested: ", opt.how_many)
+print("total time: ", total_time)
+print("average inference time per image: ", total_time/(opt.how_many-1))
 webpage.save()
