@@ -138,24 +138,27 @@ class LocalEnhancer(nn.Module):
         ###### global generator model #####           
         ngf_global = ngf * (2**n_local_enhancers)
         model_global = GlobalGenerator(input_nc, output_nc, ngf_global, n_downsample_global, n_blocks_global, norm_layer).model        
+
         model_global = [model_global[i] for i in range(len(model_global)-3)] # get rid of final convolution layers        
         self.model = nn.Sequential(*model_global)                
 
         ###### local enhancer layers #####
+
         for n in range(1, n_local_enhancers+1):
             ### downsample            
             ngf_global = ngf * (2**(n_local_enhancers-n))
+            
             model_downsample = [nn.ReflectionPad2d(3), nn.Conv2d(input_nc, ngf_global, kernel_size=7, padding=0), 
                                 norm_layer(ngf_global), nn.ReLU(True),
-                                nn.Conv2d(ngf_global, ngf_global * 2, kernel_size=3, stride=2, padding=1), 
-                                norm_layer(ngf_global * 2), nn.ReLU(True)]
+                                nn.Conv2d(ngf_global, ngf_global, kernel_size=3, stride=2, padding=1), 
+                                norm_layer(ngf_global), nn.ReLU(True)]
             ### residual blocks
             model_upsample = []
             for i in range(n_blocks_local):
-                model_upsample += [ResnetBlock(ngf_global * 2, padding_type=padding_type, norm_layer=norm_layer)]
+                model_upsample += [ResnetBlock(ngf_global, padding_type=padding_type, norm_layer=norm_layer)]
 
             ### upsample
-            model_upsample += [nn.ConvTranspose2d(ngf_global * 2, ngf_global, kernel_size=3, stride=2, padding=1, output_padding=1), 
+            model_upsample += [nn.ConvTranspose2d(ngf_global, ngf_global, kernel_size=3, stride=2, padding=1, output_padding=1), 
                                norm_layer(ngf_global), nn.ReLU(True)]      
 
             ### final convolution
@@ -180,7 +183,12 @@ class LocalEnhancer(nn.Module):
             model_downsample = getattr(self, 'model'+str(n_local_enhancers)+'_1')
             model_upsample = getattr(self, 'model'+str(n_local_enhancers)+'_2')            
             input_i = input_downsampled[self.n_local_enhancers-n_local_enhancers]            
+            #print(input_i.shape) 
+            #print(model_downsample(input_i).shape)
+            #print(output_prev.shape)
             output_prev = model_upsample(model_downsample(input_i) + output_prev)
+        
+        
         return output_prev
 
 class GlobalGenerator(nn.Module):
