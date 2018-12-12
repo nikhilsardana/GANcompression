@@ -6,8 +6,8 @@ import functools
 from torch.autograd import Variable
 import numpy as np
 import torch.nn.functional as F
-
-from spectral_normalization import SpectralNorm
+import torch.nn.utils.spectral_norm as SpectralNorm
+#from spectral_normalization import SpectralNorm
 ###############################################################################
 # Functions
 ###############################################################################
