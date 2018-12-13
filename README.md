@@ -1,3 +1,11 @@
+This is the project repository of Nikhil Sardana, Jerry Jiang, and Nathan Dalal, for the fall 2018 course CS 236.
+
+Forked from nvidia/pix2pixHD.
+
+
+<br><br><br><br>
+
+
 <img src='imgs/teaser_720.gif' align="right" width=360>
 
 <br><br><br><br>
